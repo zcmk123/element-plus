@@ -13,8 +13,10 @@
     "lib": ["ES2018", "DOM"],
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "types": ["vitest/global"]
   },
-  "include": ["packages"],
-  "exclude": ["node_modules", "**/__test?__", "**/dist"]
+  "include": ["packages", "typings"],
+  "exclude": ["node_modules", "**/dist"]
 }

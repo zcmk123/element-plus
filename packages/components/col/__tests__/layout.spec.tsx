@@ -1,4 +1,4 @@
-import { h, ref, nextTick } from 'vue'
+import { ref, nextTick, defineComponent } from 'vue'
 import { mount } from '@vue/test-utils'
 import Row from '@element-plus/components/row'
 import Col from '../src/col'
@@ -50,21 +50,11 @@ describe('Col', () => {
     const outer = ref(20)
     const App = {
       setup() {
-        return () => {
-          return h(
-            Row,
-            {
-              gutter: outer.value,
-              ref: 'row',
-            },
-            [
-              h(Col, {
-                span: 12,
-                ref: 'col',
-              }),
-            ]
-          )
-        }
+        return () => (
+          <Row gutter={outer.value} ref="row">
+            <Col span={12} ref="col" />
+          </Row>
+        )
       },
     }
 
@@ -85,16 +75,20 @@ describe('Col', () => {
   })
 
   it('responsive', () => {
-    const TestComponent = {
-      template: `<el-row :gutter="20">
-      <el-col ref="col" :sm="{ span: 4, offset: 2 }" :md="8" :lg="{ span: 6, offset: 3 }">
-      </el-col>
-    </el-row>`,
-      components: {
-        'el-col': Col,
-        'el-row': Row,
+    const TestComponent = defineComponent({
+      setup() {
+        return () => (
+          <Row gutter={20}>
+            <Col
+              ref="col"
+              sm={{ span: 4, offset: 2 }}
+              md={8}
+              lg={{ span: 6, offset: 3 }}
+            ></Col>
+          </Row>
+        )
       },
-    }
+    })
     const wrapper = mount(TestComponent)
     const colElmClass = wrapper.findComponent({ ref: 'col' }).classes()
     expect(colElmClass.includes('el-col-sm-4')).toBe(true)

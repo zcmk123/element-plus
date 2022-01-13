@@ -1,4 +1,4 @@
-import { nextTick } from 'vue'
+import { nextTick, markRaw } from 'vue'
 import { mount } from '@vue/test-utils'
 import { User } from '@element-plus/icons-vue'
 import {
@@ -40,7 +40,7 @@ describe('Avatar.vue', () => {
 
   test('icon avatar', () => {
     const wrapper = mount(Avatar, {
-      props: { icon: User },
+      props: { icon: markRaw(User) },
     })
     expect(wrapper.classes()).toContain('el-avatar--icon')
     expect(wrapper.findComponent(User).exists()).toBe(true)

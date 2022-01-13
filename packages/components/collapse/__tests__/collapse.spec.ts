@@ -98,7 +98,7 @@ describe('Collapse.vue', () => {
   })
 
   test('event:change', async () => {
-    const onChange = jest.fn()
+    const onChange = vitest.fn()
     const wrapper = mount({
       components: {
         'el-collapse': Collapse,

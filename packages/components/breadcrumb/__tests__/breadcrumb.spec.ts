@@ -1,3 +1,4 @@
+import { markRaw } from 'vue'
 import { mount } from '@vue/test-utils'
 import { Check } from '@element-plus/icons-vue'
 import Breadcrumb from '../src/breadcrumb.vue'
@@ -12,7 +13,7 @@ const _mount = (template: string) =>
       },
       data() {
         return {
-          Check,
+          Check: markRaw(Check),
         }
       },
       template,

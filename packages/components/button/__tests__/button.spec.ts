@@ -1,4 +1,4 @@
-import { ref, h, nextTick } from 'vue'
+import { ref, h, nextTick, markRaw } from 'vue'
 import { mount } from '@vue/test-utils'
 import { Loading, Search } from '@element-plus/icons-vue'
 import Button from '../src/button.vue'
@@ -16,7 +16,7 @@ describe('Button.vue', () => {
 
   it('icon', () => {
     const wrapper = mount(Button, {
-      props: { icon: Search },
+      props: { icon: markRaw(Search) },
     })
     expect(wrapper.findComponent(Search).exists()).toBeTruthy()
   })
@@ -83,7 +83,7 @@ describe('Button.vue', () => {
         default: '<span class="inner-slot"></span>',
       },
     })
-    await (<HTMLElement>wrapper.element.querySelector('.inner-slot')).click()
+    ;(wrapper.element.querySelector('.inner-slot') as HTMLElement).click()
     expect(wrapper.emitted()).toBeDefined()
   })
 

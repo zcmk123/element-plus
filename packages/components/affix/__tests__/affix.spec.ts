@@ -38,7 +38,7 @@ describe('Affix.vue', () => {
     `)
     await nextTick()
     expect(wrapper.text()).toEqual(AXIOM)
-    const mockAffixRect = jest
+    const mockAffixRect = vitest
       .spyOn(wrapper.find('.el-affix').element, 'getBoundingClientRect')
       .mockReturnValue({
         height: 40,
@@ -46,7 +46,7 @@ describe('Affix.vue', () => {
         top: -100,
         bottom: -80,
       } as DOMRect)
-    const mockDocumentRect = jest
+    const mockDocumentRect = vitest
       .spyOn(document.documentElement, 'getBoundingClientRect')
       .mockReturnValue({
         height: 200,
