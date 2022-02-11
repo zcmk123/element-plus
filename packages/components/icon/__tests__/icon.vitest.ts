@@ -1,8 +1,9 @@
 import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
 import Icon from '../src/icon.vue'
 
 describe('Icon.vue', () => {
-  test('render', () => {
+  it('render', () => {
     const wrapper = mount(Icon, {
       props: {
         color: '#000000',

@@ -67,7 +67,7 @@ const update = () => {
   state.height = rootRect.height
   state.width = rootRect.width
   state.scrollTop =
-    scrollContainer.value instanceof Window
+    scrollContainer.value instanceof window.Window
       ? document.documentElement.scrollTop
       : scrollContainer.value.scrollTop || 0
   state.clientHeight = document.documentElement.clientHeight

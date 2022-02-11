@@ -1,10 +1,11 @@
 import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
 import Card from '../src/card.vue'
 
 const AXIOM = 'Rem is the best girl'
 
 describe('Card.vue', () => {
-  test('render test', () => {
+  it('render test', () => {
     const wrapper = mount(Card, {
       slots: {
         default: AXIOM,
@@ -13,7 +14,7 @@ describe('Card.vue', () => {
     expect(wrapper.text()).toEqual(AXIOM)
   })
 
-  test('string header', () => {
+  it('string header', () => {
     const header = 'I am header'
     const wrapper = mount(Card, {
       slots: {
@@ -26,23 +27,25 @@ describe('Card.vue', () => {
     expect(wrapper.text()).toContain(header)
   })
 
-  test('vnode header', () => {
+  it('vnode header', () => {
     const headerCls = 'header-text'
     const btnCls = 'test-btn'
     const wrapper = mount(Card, {
       slots: {
         default: AXIOM,
-        header: `<div>
-          <span class="${headerCls}">card header</span>
-          <button class="${btnCls}">click me</button>
-        </div>`,
+        header: () => (
+          <div>
+            <span class={headerCls}>card header</span>
+            <button class={btnCls}>click me</button>
+          </div>
+        ),
       },
     })
     expect(wrapper.find('.header-text').exists()).toBe(true)
     expect(wrapper.find('.test-btn').exists()).toBe(true)
   })
 
-  test('body style', () => {
+  it('body style', () => {
     const style = 'font-size: 14px;'
     const wrapper = mount(Card, {
       props: {
@@ -55,7 +58,7 @@ describe('Card.vue', () => {
     expect(wrapper.find('.el-card__body').attributes('style')).toBe(style)
   })
 
-  test('body style with object', () => {
+  it('body style with object', () => {
     const style = { 'font-size': '14px' }
     const wrapper = mount(Card, {
       props: {
@@ -70,7 +73,7 @@ describe('Card.vue', () => {
     )
   })
 
-  test('body style with array', () => {
+  it('body style with array', () => {
     const style = [{ 'font-size': '14px' }, { color: 'blue' }]
     const wrapper = mount(Card, {
       props: {
@@ -85,7 +88,7 @@ describe('Card.vue', () => {
     ).toBe('font-size:14px;color:blue;')
   })
 
-  test('shadow', () => {
+  it('shadow', () => {
     const shadow = 'test-shadow'
     const wrapper = mount(Card, {
       props: {

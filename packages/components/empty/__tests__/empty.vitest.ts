@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest'
 import makeMount from '@element-plus/test-utils/make-mount'
 import Empty from '../src/empty.vue'
 
@@ -5,7 +6,7 @@ const AXIOM = 'Rem is the best girl'
 
 describe('Empty.vue', () => {
   const mount = makeMount(Empty, {})
-  test('render test', () => {
+  it('render test', () => {
     const wrapper = mount({
       slots: {
         default: AXIOM,
@@ -16,7 +17,7 @@ describe('Empty.vue', () => {
     expect(wrapper.find('.el-empty__bottom').exists()).toBe(true)
   })
 
-  test('should render image props', () => {
+  it('should render image props', () => {
     const wrapper = mount({
       props: {
         image: AXIOM,
@@ -25,7 +26,7 @@ describe('Empty.vue', () => {
     expect(wrapper.find('.el-empty__image img').exists()).toBe(true)
   })
 
-  test('should render imageSize props', async () => {
+  it('should render imageSize props', async () => {
     const wrapper = mount({
       props: {
         imageSize: 500,
@@ -42,7 +43,7 @@ describe('Empty.vue', () => {
     )
   })
 
-  test('should render description props', () => {
+  it('should render description props', () => {
     const wrapper = mount({
       props: {
         description: AXIOM,
@@ -50,7 +51,7 @@ describe('Empty.vue', () => {
     })
     expect(wrapper.find('.el-empty__description').text()).toEqual(AXIOM)
   })
-  test('should render image slots', () => {
+  it('should render image slots', () => {
     const wrapper = mount({
       slots: {
         image: AXIOM,
@@ -59,7 +60,7 @@ describe('Empty.vue', () => {
     expect(wrapper.find('.el-empty__image').text()).toEqual(AXIOM)
   })
 
-  test('should render description slots', () => {
+  it('should render description slots', () => {
     const wrapper = mount({
       slots: {
         description: AXIOM,
@@ -68,7 +69,7 @@ describe('Empty.vue', () => {
     expect(wrapper.find('.el-empty__description').text()).toEqual(AXIOM)
   })
 
-  test('should render default slots', () => {
+  it('should render default slots', () => {
     const wrapper = mount({
       slots: {
         default: AXIOM,

@@ -1,10 +1,11 @@
 import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
 import Divider from '../src/divider.vue'
 
 const AXIOM = 'Rem is the best girl'
 
 describe('Divider.vue', () => {
-  test('render test', () => {
+  it('render test', () => {
     const wrapper = mount(Divider, {
       slots: {
         default: AXIOM,
@@ -13,7 +14,7 @@ describe('Divider.vue', () => {
     expect(wrapper.text()).toBe(AXIOM)
   })
 
-  test('direction', () => {
+  it('direction', () => {
     const wrapper = mount(Divider, {
       props: {
         direction: 'vertical',
@@ -22,7 +23,7 @@ describe('Divider.vue', () => {
     expect(wrapper.classes()).toContain('el-divider--vertical')
   })
 
-  test('contentPosition', () => {
+  it('contentPosition', () => {
     const wrapper = mount(Divider, {
       slots: {
         default: AXIOM,
@@ -34,7 +35,7 @@ describe('Divider.vue', () => {
     expect(wrapper.find('.el-divider__text').classes()).toContain('is-right')
   })
 
-  test('customClass', () => {
+  it('customClass', () => {
     const wrapper = mount(Divider, {
       props: {
         class: 'customClass',
@@ -43,7 +44,7 @@ describe('Divider.vue', () => {
     expect(wrapper.classes()).toContain('customClass')
   })
 
-  test('line-dashed', () => {
+  it('line-dashed', () => {
     const wrapper = mount(Divider, {
       props: {
         borderStyle: 'dashed',
@@ -56,7 +57,7 @@ describe('Divider.vue', () => {
     ).toBe('dashed')
   })
 
-  test('line-solid', () => {
+  it('line-solid', () => {
     const wrapper = mount(Divider, {
       props: {
         direction: 'vertical',

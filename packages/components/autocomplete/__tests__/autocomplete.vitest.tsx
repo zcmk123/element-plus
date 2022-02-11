@@ -1,58 +1,60 @@
-import { nextTick } from 'vue'
+import { ref, nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { NOOP } from '@vue/shared'
+import { describe, it, expect, vi, beforeEach, afterEach, fn } from 'vitest'
 import { POPPER_CONTAINER_SELECTOR } from '@element-plus/hooks'
+import { debugWarn } from '@element-plus/utils'
 import Autocomplete from '../src/index.vue'
 
-jest.unmock('lodash')
+vi.mock('@element-plus/utils/error', async () => ({
+  ...vi.importActual('@element-plus/utils/error'),
+  debugWarn: fn(),
+}))
 
-jest.useFakeTimers()
-
-const _mount = (payload = {}) =>
-  mount({
-    components: {
-      'el-autocomplete': Autocomplete,
-    },
-    data() {
-      return {
-        state: '',
-        list: [
-          { value: 'Java', tag: 'java' },
-          { value: 'Go', tag: 'go' },
-          { value: 'JavaScript', tag: 'javascript' },
-          { value: 'Python', tag: 'python' },
-        ],
-        payload,
-      }
-    },
-    methods: {
-      querySearch(queryString, cb) {
-        cb(
-          queryString
-            ? this.list.filter(
-                (i) => i.value.indexOf(queryString.toLowerCase()) === 0
-              )
-            : this.list
-        )
-      },
-    },
-    template: `
-    <el-autocomplete
-      ref="autocomplete"
-      v-model="state"
-      :fetch-suggestions="querySearch"
-      v-bind="payload"
-    />
-  `,
-  })
-
+const _mount = (payload: Record<string, any> = {}) => {
+  const state = ref('')
+  const list = [
+    { value: 'Java', tag: 'java' },
+    { value: 'Go', tag: 'go' },
+    { value: 'JavaScript', tag: 'javascript' },
+    { value: 'Python', tag: 'python' },
+  ]
+  const querySearch = (queryString: string, cb: (data: any[]) => void) => {
+    if (!queryString) cb(list)
+    cb(
+      list.filter((i) =>
+        i.value.toLowerCase().startsWith(queryString.toLowerCase())
+      )
+    )
+  }
+  return {
+    wrapper: mount({
+      setup: () => () =>
+        (
+          <Autocomplete
+            ref="autocomplete"
+            v-model={state.value}
+            fetchSuggestions={querySearch}
+            {...payload}
+          />
+        ),
+    }),
+    state,
+  }
+}
 describe('Autocomplete.vue', () => {
   beforeEach(() => {
+    vi.useFakeTimers()
     document.body.innerHTML = ''
   })
 
-  test('placeholder', async () => {
-    const wrapper = _mount()
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.resetAllMocks()
+  })
+
+  it('placeholder', async () => {
+    const { wrapper } = _mount()
     await nextTick()
 
     await wrapper.setProps({ placeholder: 'autocomplete' })
@@ -62,9 +64,9 @@ describe('Autocomplete.vue', () => {
     expect(wrapper.find('input').attributes('placeholder')).toBe('placeholder')
   })
 
-  test('triggerOnFocus', async () => {
-    const fetchSuggestions = jest.fn()
-    const wrapper = _mount({
+  it('triggerOnFocus', async () => {
+    const fetchSuggestions = fn()
+    const { wrapper } = _mount({
       debounce: 10,
       fetchSuggestions,
     })
@@ -72,7 +74,7 @@ describe('Autocomplete.vue', () => {
 
     await wrapper.setProps({ triggerOnFocus: false })
     await wrapper.find('input').trigger('focus')
-    jest.runAllTimers()
+    vi.runAllTimers()
     await nextTick()
     expect(fetchSuggestions).toHaveBeenCalledTimes(0)
 
@@ -80,41 +82,46 @@ describe('Autocomplete.vue', () => {
 
     await wrapper.setProps({ triggerOnFocus: true })
     await wrapper.find('input').trigger('focus')
-    jest.runAllTimers()
+    vi.runAllTimers()
     await nextTick()
     expect(fetchSuggestions).toHaveBeenCalledTimes(1)
   })
 
-  test('popperClass', async () => {
-    const wrapper = _mount()
+  it('popperClass', async () => {
+    const { wrapper } = _mount()
     await nextTick()
 
     await wrapper.setProps({ popperClass: 'error' })
     expect(
-      document.body.querySelector('.el-popper').classList.contains('error')
+      document.body.querySelector('.el-popper')!.classList.contains('error')
     ).toBe(true)
 
     await wrapper.setProps({ popperClass: 'success' })
     expect(
-      document.body.querySelector('.el-popper').classList.contains('error')
+      document.body.querySelector('.el-popper')!.classList.contains('error')
     ).toBe(false)
     expect(
-      document.body.querySelector('.el-popper').classList.contains('success')
+      document.body.querySelector('.el-popper')!.classList.contains('success')
     ).toBe(true)
   })
 
-  test('popperAppendToBody', async () => {
+  it('popperAppendToBody', async () => {
     _mount({ popperAppendToBody: false })
     expect(document.body.querySelector('.el-popper__mask')).toBeNull()
+    expect(debugWarn).toBeCalled()
   })
 
-  test('debounce / fetchSuggestions', async () => {
-    const fetchSuggestions = jest.fn()
-    const wrapper = _mount({
+  it.todo('teleported')
+
+  it('debounce / fetchSuggestions', async () => {
+    const fetchSuggestions = fn()
+    const { wrapper } = _mount({
       debounce: 10,
       fetchSuggestions,
+      triggerOnFocus: true,
     })
     await nextTick()
+    vi.runAllTimers()
 
     await wrapper.find('input').trigger('focus')
     await wrapper.find('input').trigger('blur')
@@ -123,41 +130,41 @@ describe('Autocomplete.vue', () => {
     await wrapper.find('input').trigger('focus')
     await wrapper.find('input').trigger('blur')
     expect(fetchSuggestions).toHaveBeenCalledTimes(0)
-    jest.runAllTimers()
+    vi.runAllTimers()
     await nextTick()
 
     expect(fetchSuggestions).toHaveBeenCalledTimes(1)
     await wrapper.find('input').trigger('focus')
-    jest.runAllTimers()
+    vi.runAllTimers()
     await nextTick()
 
     expect(fetchSuggestions).toHaveBeenCalledTimes(2)
   })
 
-  test('valueKey / modelValue', async () => {
-    const wrapper = _mount()
+  it('valueKey / modelValue', async () => {
+    const { wrapper, state } = _mount()
     await nextTick()
     const target = wrapper.findComponent({ ref: 'autocomplete' })
       .vm as InstanceType<typeof Autocomplete>
 
     await target.select({ value: 'Go', tag: 'go' })
-    expect(wrapper.vm.state).toBe('Go')
+    expect(state.value).toBe('Go')
 
     await wrapper.setProps({ valueKey: 'tag' })
 
     await target.select({ value: 'Go', tag: 'go' })
-    expect(wrapper.vm.state).toBe('go')
+    expect(state.value).toBe('go')
   })
 
-  test('hideLoading', async () => {
-    const wrapper = _mount({
+  it('hideLoading', async () => {
+    const { wrapper } = _mount({
       hideLoading: false,
       fetchSuggestions: NOOP,
       debounce: 10,
     })
     await nextTick()
     await wrapper.find('input').trigger('focus')
-    jest.runAllTimers()
+    vi.runAllTimers()
     await nextTick()
 
     expect(document.body.querySelector('.el-icon-loading')).toBeDefined()
@@ -165,7 +172,7 @@ describe('Autocomplete.vue', () => {
     expect(document.body.querySelector('.el-icon-loading')).toBeNull()
   })
 
-  test('selectWhenUnmatched', async () => {
+  it('selectWhenUnmatched', async () => {
     const wrapper = mount(Autocomplete, {
       props: {
         selectWhenUnmatched: true,
@@ -176,21 +183,21 @@ describe('Autocomplete.vue', () => {
 
     wrapper.vm.highlightedIndex = 0
     wrapper.vm.handleKeyEnter()
-    jest.runAllTimers()
+    vi.runAllTimers()
     await nextTick()
 
     expect(wrapper.vm.highlightedIndex).toBe(-1)
   })
 
-  test('highlightFirstItem', async () => {
-    const wrapper = _mount({
+  it('highlightFirstItem', async () => {
+    const { wrapper } = _mount({
       highlightFirstItem: false,
       debounce: 10,
     })
     await nextTick()
 
     await wrapper.find('input').trigger('focus')
-    jest.runAllTimers()
+    vi.runAllTimers()
     await nextTick()
 
     expect(document.body.querySelector('.highlighted')).toBeNull()
@@ -198,7 +205,7 @@ describe('Autocomplete.vue', () => {
     await wrapper.setProps({ highlightFirstItem: true })
 
     await wrapper.find('input').trigger('focus')
-    jest.runAllTimers()
+    vi.runAllTimers()
     await nextTick()
 
     expect(document.body.querySelector('.highlighted')).toBeDefined()
@@ -211,7 +218,7 @@ describe('Autocomplete.vue', () => {
 
       await nextTick()
       expect(
-        document.body.querySelector(POPPER_CONTAINER_SELECTOR).innerHTML
+        document.body.querySelector(POPPER_CONTAINER_SELECTOR)!.innerHTML
       ).not.toBe('')
     })
 
@@ -223,7 +230,7 @@ describe('Autocomplete.vue', () => {
 
       await nextTick()
       expect(
-        document.body.querySelector(POPPER_CONTAINER_SELECTOR).innerHTML
+        document.body.querySelector(POPPER_CONTAINER_SELECTOR)!.innerHTML
       ).toBe('')
     })
   })

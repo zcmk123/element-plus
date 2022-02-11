@@ -1,10 +1,11 @@
 import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
 import Tag from '../src/tag.vue'
 
 const AXIOM = 'Rem is the best girl'
 
 describe('Tag.vue', () => {
-  test('render text & class', () => {
+  it('render text & class', () => {
     const wrapper = mount(Tag, {
       slots: {
         default: AXIOM,
@@ -20,17 +21,17 @@ describe('Tag.vue', () => {
     expect(vm.$el.classList.contains('md-fade-center')).toEqual(false)
   })
 
-  test('type', () => {
+  it('type', () => {
     const wrapper = mount(Tag, {
       props: {
-        type: 'primary',
+        type: 'info',
       },
     })
     const vm = wrapper.vm
-    expect(vm.$el.classList.contains('el-tag--primary')).toEqual(true)
+    expect(vm.$el.classList.contains('el-tag--info')).toEqual(true)
   })
 
-  test('hit', () => {
+  it('hit', () => {
     const wrapper = mount(Tag, {
       props: {
         hit: true,
@@ -40,7 +41,7 @@ describe('Tag.vue', () => {
     expect(vm.$el.classList.contains('is-hit')).toEqual(true)
   })
 
-  test('closable', async () => {
+  it('closable', async () => {
     const wrapper = mount(Tag, {
       props: {
         closable: true,
@@ -53,7 +54,7 @@ describe('Tag.vue', () => {
     expect(wrapper.emitted().close).toBeTruthy()
   })
 
-  test('closeTransition', () => {
+  it('closeTransition', () => {
     const wrapper = mount(Tag, {
       props: {
         closeTransition: true,
@@ -63,7 +64,7 @@ describe('Tag.vue', () => {
     expect(vm.$el.classList.contains('md-fade-center')).toEqual(false)
   })
 
-  test('color', () => {
+  it('color', () => {
     const wrapper = mount(Tag, {
       props: {
         color: 'rgb(0, 0, 0)',
@@ -73,7 +74,7 @@ describe('Tag.vue', () => {
     expect(vm.$el.style.backgroundColor).toEqual('rgb(0, 0, 0)')
   })
 
-  test('theme', () => {
+  it('theme', () => {
     const wrapper = mount(Tag, {
       props: {
         effect: 'dark',
@@ -87,7 +88,7 @@ describe('Tag.vue', () => {
   })
 
   // should also support large size
-  test('size', () => {
+  it('size', () => {
     const wrapper = mount(Tag, {
       props: {
         size: 'large',

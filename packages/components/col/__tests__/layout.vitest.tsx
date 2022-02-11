@@ -1,5 +1,6 @@
-import { h, ref, nextTick } from 'vue'
+import { ref, nextTick, defineComponent } from 'vue'
 import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
 import Row from '@element-plus/components/row'
 import Col from '../src/col'
 
@@ -31,15 +32,14 @@ describe('Col', () => {
   })
 
   it('gutter', () => {
-    const TestComponent = {
-      template: `<el-row :gutter="20">
-      <el-col :span="12" ref="col"></el-col>
-    </el-row>`,
-      components: {
-        'el-col': Col,
-        'el-row': Row,
-      },
-    }
+    const TestComponent = defineComponent({
+      setup: () => () =>
+        (
+          <Row gutter={20}>
+            <Col span={12} ref="col"></Col>
+          </Row>
+        ),
+    })
     const wrapper = mount(TestComponent)
     const colElm = wrapper.findComponent({ ref: 'col' }).element as HTMLElement
     expect(colElm.style.paddingLeft === '10px').toBe(true)
@@ -49,23 +49,12 @@ describe('Col', () => {
   it('change gutter value', async () => {
     const outer = ref(20)
     const App = {
-      setup() {
-        return () => {
-          return h(
-            Row,
-            {
-              gutter: outer.value,
-              ref: 'row',
-            },
-            [
-              h(Col, {
-                span: 12,
-                ref: 'col',
-              }),
-            ]
-          )
-        }
-      },
+      setup: () => () =>
+        (
+          <Row gutter={outer.value} ref="row">
+            <Col span={12} ref="col" />
+          </Row>
+        ),
     }
 
     const wrapper = mount(App)
@@ -85,16 +74,19 @@ describe('Col', () => {
   })
 
   it('responsive', () => {
-    const TestComponent = {
-      template: `<el-row :gutter="20">
-      <el-col ref="col" :sm="{ span: 4, offset: 2 }" :md="8" :lg="{ span: 6, offset: 3 }">
-      </el-col>
-    </el-row>`,
-      components: {
-        'el-col': Col,
-        'el-row': Row,
-      },
-    }
+    const TestComponent = defineComponent({
+      setup: () => () =>
+        (
+          <Row gutter={20}>
+            <Col
+              ref="col"
+              sm={{ span: 4, offset: 2 }}
+              md={8}
+              lg={{ span: 6, offset: 3 }}
+            />
+          </Row>
+        ),
+    })
     const wrapper = mount(TestComponent)
     const colElmClass = wrapper.findComponent({ ref: 'col' }).classes()
     expect(colElmClass.includes('el-col-sm-4')).toBe(true)
@@ -107,12 +99,12 @@ describe('Col', () => {
 })
 
 describe('Row', () => {
-  test('create', () => {
+  it('create', () => {
     const wrapper = mount(Row)
     expect(wrapper.classes()).toContain('el-row')
   })
 
-  test('gutter', () => {
+  it('gutter', () => {
     const wrapper = mount(Row, {
       props: { gutter: 20 },
     })
@@ -120,13 +112,13 @@ describe('Row', () => {
     expect(rowElm.style.marginLeft).toEqual('-10px')
     expect(rowElm.style.marginRight).toEqual('-10px')
   })
-  test('justify', () => {
+  it('justify', () => {
     const wrapper = mount(Row, {
       props: { justify: 'end' },
     })
     expect(wrapper.classes()).toContain('is-justify-end')
   })
-  test('align', () => {
+  it('align', () => {
     const wrapper = mount(Row, {
       props: { align: 'bottom' },
     })

@@ -1,5 +1,10 @@
+<<<<<<<< HEAD:packages/components/button/__tests__/button.spec.tsx
 import { ref, nextTick, defineComponent } from 'vue'
+========
+import { ref, nextTick, defineComponent, markRaw } from 'vue'
+>>>>>>>> abe82d115 (test: comp):packages/components/button/__tests__/button.vitest.tsx
 import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
 import { Loading, Search } from '@element-plus/icons-vue'
 import Button from '../src/button.vue'
 import ButtonGroup from '../src/button-group.vue'
@@ -14,10 +19,9 @@ describe('Button.vue', () => {
     })
     expect(wrapper.classes()).toContain('el-button--primary')
   })
-
   it('icon', () => {
     const wrapper = mount(Button, {
-      props: { icon: Search },
+      props: { icon: markRaw(Search) },
     })
     expect(wrapper.findComponent(Search).exists()).toBeTruthy()
   })
@@ -59,7 +63,7 @@ describe('Button.vue', () => {
     expect(wrapper.classes()).toContain('is-circle')
   })
 
-  test('render text', () => {
+  it('render text', () => {
     const wrapper = mount(Button, {
       slots: {
         default: AXIOM,
@@ -68,7 +72,7 @@ describe('Button.vue', () => {
     expect(wrapper.text()).toEqual(AXIOM)
   })
 
-  test('handle click', async () => {
+  it('handle click', async () => {
     const wrapper = mount(Button, {
       slots: {
         default: AXIOM,
@@ -78,7 +82,7 @@ describe('Button.vue', () => {
     expect(wrapper.emitted()).toBeDefined()
   })
 
-  test('handle click inside', async () => {
+  it('handle click inside', async () => {
     const wrapper = mount(Button, {
       slots: {
         default: '<span class="inner-slot"></span>',
@@ -88,7 +92,7 @@ describe('Button.vue', () => {
     expect(wrapper.emitted()).toBeDefined()
   })
 
-  test('loading implies disabled', async () => {
+  it('loading implies disabled', async () => {
     const wrapper = mount(Button, {
       slots: {
         default: AXIOM,
@@ -123,17 +127,27 @@ describe('Button.vue', () => {
       setup: () => () =>
         (
           <Button
+<<<<<<<< HEAD:packages/components/button/__tests__/button.spec.tsx
             v-slots={{ loading: <span class="custom-loading">111</span> }}
             loading={true}
           >
             Loading
           </Button>
+========
+            v-slots={{
+              default: () => 'Loading',
+              loading: () => <span class="custom-loading">111</span>,
+            }}
+            loading={true}
+          />
+>>>>>>>> abe82d115 (test: comp):packages/components/button/__tests__/button.vitest.tsx
         ),
     })
     const wrapper = mount(App)
     expect(wrapper.find('.custom-loading').exists()).toBeTruthy()
   })
 })
+
 describe('Button Group', () => {
   it('create', () => {
     const wrapper = mount({

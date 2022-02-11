@@ -1,11 +1,12 @@
 import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
 import { TypeComponentsMap } from '@element-plus/utils'
 import Alert from '../src/alert.vue'
 
 const AXIOM = 'Rem is the best girl'
 
 describe('Alert.vue', () => {
-  test('render test & class', () => {
+  it('render test & class', () => {
     const wrapper = mount(Alert, {
       props: {
         title: AXIOM,
@@ -16,7 +17,7 @@ describe('Alert.vue', () => {
     expect(wrapper.find('.el-alert').classes()).toContain('el-alert--info')
   })
 
-  test('type', () => {
+  it('type', () => {
     const wrapper = mount(Alert, {
       props: {
         title: 'test',
@@ -29,7 +30,7 @@ describe('Alert.vue', () => {
     expect(wrapper.findComponent(TypeComponentsMap.success).exists()).toBe(true)
   })
 
-  test('description', () => {
+  it('description', () => {
     const wrapper = mount(Alert, {
       props: {
         title: 'Dorne',
@@ -40,7 +41,7 @@ describe('Alert.vue', () => {
     expect(wrapper.find('.el-alert__description').text()).toEqual(AXIOM)
   })
 
-  test('theme', () => {
+  it('theme', () => {
     const wrapper = mount(Alert, {
       props: {
         title: 'test',
@@ -50,7 +51,7 @@ describe('Alert.vue', () => {
     expect(wrapper.find('.el-alert').classes()).toContain('is-dark')
   })
 
-  test('title slot', () => {
+  it('title slot', () => {
     const wrapper = mount(Alert, {
       slots: {
         title: AXIOM,
@@ -59,7 +60,7 @@ describe('Alert.vue', () => {
     expect(wrapper.find('.el-alert__title').text()).toEqual(AXIOM)
   })
 
-  test('close', async () => {
+  it('close', async () => {
     const wrapper = mount(Alert, {
       props: {
         closeText: 'close',

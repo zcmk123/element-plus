@@ -1,5 +1,6 @@
-import { nextTick } from 'vue'
-import { mount } from '@vue/test-utils'
+import { markRaw, nextTick } from 'vue'
+import { mount, type MountingOptions } from '@vue/test-utils'
+import { describe, it, expect, fn, vi, beforeEach, afterEach } from 'vitest'
 import { User } from '@element-plus/icons-vue'
 import {
   IMAGE_SUCCESS,
@@ -8,53 +9,70 @@ import {
 } from '@element-plus/test-utils'
 
 import Avatar from '../src/avatar.vue'
+import type { AvatarProps } from '../src/avatar'
+
+const warnHandler = fn()
+const _mount = (options: MountingOptions<Partial<AvatarProps>> = {}) =>
+  mount(Avatar, {
+    ...options,
+    global: { config: { warnHandler } },
+  })
 
 describe('Avatar.vue', () => {
   mockImageEvent()
 
-  test('render test', () => {
-    const wrapper = mount(Avatar)
+  const warn = vi.spyOn(console, 'warn')
+  beforeEach(() => {
+    warn.mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    warn.mockRestore()
+  })
+
+  it('render test', () => {
+    const wrapper = _mount()
     expect(wrapper.find('.el-avatar').exists()).toBe(true)
   })
 
-  test('size is number', () => {
-    const wrapper = mount(Avatar, {
+  it('size is number', () => {
+    const wrapper = _mount({
       props: { size: 50 },
     })
     expect(wrapper.attributes('style')).toContain('--el-avatar-size: 50px;')
   })
 
-  test('size is string', () => {
-    const wrapper = mount(Avatar, {
+  it('size is string', () => {
+    const wrapper = _mount({
       props: { size: 'small' },
     })
     expect(wrapper.classes()).toContain('el-avatar--small')
   })
 
-  test('shape', () => {
-    const wrapper = mount(Avatar, {
+  it('shape', () => {
+    const wrapper = _mount({
       props: { size: 'small', shape: 'square' },
     })
     expect(wrapper.classes()).toContain('el-avatar--square')
   })
 
-  test('icon avatar', () => {
-    const wrapper = mount(Avatar, {
-      props: { icon: User },
+  it('icon avatar', () => {
+    const wrapper = _mount({
+      props: { icon: markRaw(User) },
     })
     expect(wrapper.classes()).toContain('el-avatar--icon')
     expect(wrapper.findComponent(User).exists()).toBe(true)
   })
 
-  test('image avatar', () => {
-    const wrapper = mount(Avatar, {
+  it('image avatar', () => {
+    const wrapper = _mount({
       props: { src: IMAGE_SUCCESS },
     })
     expect(wrapper.find('img').exists()).toBe(true)
   })
 
-  test('image fallback', async () => {
-    const wrapper = mount(Avatar, {
+  it('image fallback', async () => {
+    const wrapper = _mount({
       props: { src: IMAGE_FAIL },
       slots: { default: 'fallback' },
     })
@@ -65,10 +83,10 @@ describe('Avatar.vue', () => {
     expect(wrapper.find('img').exists()).toBe(false)
   })
 
-  test('image fit', () => {
-    const fits = ['fill', 'contain', 'cover', 'none', 'scale-down']
+  it('image fit', () => {
+    const fits = ['fill', 'contain', 'cover', 'none', 'scale-down'] as const
     for (const fit of fits) {
-      const wrapper = mount(Avatar, {
+      const wrapper = _mount({
         props: { fit, src: IMAGE_SUCCESS },
       })
       expect(wrapper.find('img').attributes('style')).toContain(
@@ -77,8 +95,8 @@ describe('Avatar.vue', () => {
     }
   })
 
-  test('src changed', async () => {
-    const wrapper = mount(Avatar, {
+  it('src changed', async () => {
+    const wrapper = _mount({
       slots: { default: 'fallback' },
     })
     expect(wrapper.vm.hasLoadError).toBe(false)
