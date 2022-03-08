@@ -1,5 +1,6 @@
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
 import { CaretTop } from '@element-plus/icons-vue'
 import Backtop from '../src/backtop.vue'
 import type { VNode } from 'vue'
@@ -8,7 +9,7 @@ const _mount = (render: () => VNode) =>
   mount(render, { attachTo: document.body })
 
 describe('Backtop.vue', () => {
-  test('render', async () => {
+  it('render', async () => {
     const wrapper = _mount(() => (
       <div class="target" style="height: 100px; overflow: auto">
         <div style="height: 10000px; width: 100%">
@@ -28,12 +29,17 @@ describe('Backtop.vue', () => {
     await wrapper.trigger('scroll')
     expect(wrapper.find('.el-backtop').exists()).toBe(true)
 
-    expect(wrapper.find('.el-backtop').attributes('style')).toBe(
-      'right: 100px; bottom: 200px;'
-    )
+    expect(
+      wrapper.find('.el-backtop').attributes('style')
+    ).toMatchInlineSnapshot('"right: 100px; bottom: 200px;"')
     expect(wrapper.findComponent(CaretTop).exists()).toBe(true)
 
     await wrapper.trigger('click')
-    expect(wrapper.emitted()).toBeDefined()
+    expect(Object.keys(wrapper.emitted())).toMatchInlineSnapshot(`
+      [
+        "scroll",
+        "click",
+      ]
+    `)
   })
 })

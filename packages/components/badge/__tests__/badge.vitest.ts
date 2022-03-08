@@ -1,24 +1,25 @@
 import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
 import Badge from '../src/badge.vue'
 
 const AXIOM = 'Rem is the best girl'
 
 describe('Badge', () => {
-  test('has value', () => {
+  it('has value', () => {
     const wrapper = mount(Badge, {
       props: { value: 80 },
     })
-    expect(wrapper.vm.content).toEqual('80')
+    expect(wrapper.vm.content).toMatchInlineSnapshot('"80"')
   })
 
-  test('is fixed', () => {
+  it('is fixed', () => {
     const wrapper = mount(Badge, {
       slots: { default: AXIOM },
     })
     expect(wrapper.find('.el-badge__content.is-fixed').exists()).toBe(true)
   })
 
-  test('is dot', () => {
+  it('is dot', () => {
     const wrapper = mount(Badge, {
       props: { isDot: true },
       slots: { default: AXIOM },
@@ -29,7 +30,7 @@ describe('Badge', () => {
     ).toBe(true)
   })
 
-  test('is dot with type', () => {
+  it('is dot with type', () => {
     const wrapper = mount(Badge, {
       props: { isDot: true, type: 'success' },
       slots: { default: AXIOM },
@@ -40,12 +41,12 @@ describe('Badge', () => {
     ).toBe(true)
   })
 
-  test('max', async () => {
+  it('max', async () => {
     const wrapper = mount(Badge, {
       props: { max: 100, value: 200 },
     })
-    expect(wrapper.vm.content).toEqual('100+')
+    expect(wrapper.vm.content).toMatchInlineSnapshot('"100+"')
     await wrapper.setProps({ value: 80 })
-    expect(wrapper.vm.content).toEqual('80')
+    expect(wrapper.vm.content).toMatchInlineSnapshot('"80"')
   })
 })

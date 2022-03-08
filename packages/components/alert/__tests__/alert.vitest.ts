@@ -1,11 +1,12 @@
 import { mount } from '@vue/test-utils'
+import { describe, it, expect } from 'vitest'
 import { TypeComponentsMap } from '@element-plus/utils'
 import Alert from '../src/alert.vue'
 
 const AXIOM = 'Rem is the best girl'
 
 describe('Alert.vue', () => {
-  test('render test & class', () => {
+  it('render test & class', () => {
     const wrapper = mount(Alert, {
       props: {
         title: AXIOM,
@@ -13,10 +14,18 @@ describe('Alert.vue', () => {
       },
     })
     expect(wrapper.find('.el-alert__title').text()).toEqual(AXIOM)
-    expect(wrapper.find('.el-alert').classes()).toContain('el-alert--info')
+    expect(wrapper.find('.el-alert').classes()).toMatchInlineSnapshot(
+      `
+      [
+        "el-alert",
+        "el-alert--info",
+        "is-light",
+      ]
+    `
+    )
   })
 
-  test('type', () => {
+  it('type', () => {
     const wrapper = mount(Alert, {
       props: {
         title: 'test',
@@ -24,12 +33,27 @@ describe('Alert.vue', () => {
         showIcon: true,
       },
     })
-    expect(wrapper.find('.el-alert').classes()).toContain('el-alert--success')
-    expect(wrapper.find('.el-alert__icon').classes()).toContain('el-icon')
+    expect(wrapper.find('.el-alert').classes()).toMatchInlineSnapshot(
+      `
+      [
+        "el-alert",
+        "el-alert--success",
+        "is-light",
+      ]
+    `
+    )
+    expect(wrapper.find('.el-alert__icon').classes()).toMatchInlineSnapshot(
+      `
+      [
+        "el-icon",
+        "el-alert__icon",
+      ]
+    `
+    )
     expect(wrapper.findComponent(TypeComponentsMap.success).exists()).toBe(true)
   })
 
-  test('description', () => {
+  it('description', () => {
     const wrapper = mount(Alert, {
       props: {
         title: 'Dorne',
@@ -40,17 +64,23 @@ describe('Alert.vue', () => {
     expect(wrapper.find('.el-alert__description').text()).toEqual(AXIOM)
   })
 
-  test('theme', () => {
+  it('theme', () => {
     const wrapper = mount(Alert, {
       props: {
         title: 'test',
         effect: 'dark',
       },
     })
-    expect(wrapper.find('.el-alert').classes()).toContain('is-dark')
+    expect(wrapper.find('.el-alert').classes()).toMatchInlineSnapshot(`
+      [
+        "el-alert",
+        "el-alert--info",
+        "is-dark",
+      ]
+    `)
   })
 
-  test('title slot', () => {
+  it('title slot', () => {
     const wrapper = mount(Alert, {
       slots: {
         title: AXIOM,
@@ -59,7 +89,7 @@ describe('Alert.vue', () => {
     expect(wrapper.find('.el-alert__title').text()).toEqual(AXIOM)
   })
 
-  test('close', async () => {
+  it('close', async () => {
     const wrapper = mount(Alert, {
       props: {
         closeText: 'close',
@@ -70,6 +100,11 @@ describe('Alert.vue', () => {
     expect(closeBtn.exists()).toBe(true)
 
     await closeBtn.trigger('click')
-    expect(wrapper.emitted()).toBeDefined()
+    expect(Object.keys(wrapper.emitted())).toMatchInlineSnapshot(`
+      [
+        "close",
+        "click",
+      ]
+    `)
   })
 })

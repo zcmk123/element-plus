@@ -67,4 +67,9 @@ function handleError(e: Event) {
   hasLoadError.value = true
   emit('error', e)
 }
+
+defineExpose({
+  /** @description Whether an error occurred while loading. */
+  hasLoadError,
+})
 </script>

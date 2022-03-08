@@ -70,7 +70,7 @@ const update = () => {
   if (!scrollContainer.value) return
 
   scrollTop.value =
-    scrollContainer.value instanceof Window
+    scrollContainer.value instanceof window.Window
       ? document.documentElement.scrollTop
       : scrollContainer.value.scrollTop || 0
 
