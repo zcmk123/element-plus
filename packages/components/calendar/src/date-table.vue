@@ -1,5 +1,9 @@
 <template>
-  <table :class="[nsTable.b(), nsTable.is('range', isInRange)]" cellspacing="0" cellpadding="0">
+  <table
+    :class="[nsTable.b(), nsTable.is('range', isInRange)]"
+    cellspacing="0"
+    cellpadding="0"
+  >
     <thead v-if="!hideHeader">
       <th v-for="day in weekDays" :key="day">{{ day }}</th>
     </thead>
