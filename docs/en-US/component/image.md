@@ -65,11 +65,11 @@ image/image-preview
 
 ## Image Events
 
-| Event Name | Description          | Parameters |
-| ---------- | -------------------- | ---------- |
-| load       | Same as native load  | (e: Event) |
-| error      | Same as native error | (e: Error) |
-| switch     | When switching images| `(val: number)` switching target index |
+| Event Name | Description           | Parameters                             |
+| ---------- | --------------------- | -------------------------------------- |
+| load       | Same as native load   | (e: Event)                             |
+| error      | Same as native error  | (e: Error)                             |
+| switch     | When switching images | `(val: number)` switching target index |
 
 ## Image Slots
 
