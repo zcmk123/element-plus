@@ -69,6 +69,7 @@ image/image-preview
 | ---------- | -------------------- | ---------- |
 | load       | Same as native load  | (e: Event) |
 | error      | Same as native error | (e: Error) |
+| switch     | When switching images| `(val: number)` switching target index |
 
 ## Image Slots
 
@@ -76,6 +77,7 @@ image/image-preview
 | ----------- | ------------------------------- |
 | placeholder | Triggers when image load        |
 | error       | Triggers when image load failed |
+| viewer      | Add a description to the image  |
 
 ## ImageViewer Attributes
 
