@@ -1,4 +1,12 @@
-import { getCurrentInstance, h, ref, computed, watchEffect, unref } from 'vue'
+import {
+  getCurrentInstance,
+  h,
+  ref,
+  computed,
+  watchEffect,
+  unref,
+  Comment,
+} from 'vue'
 import { debugWarn } from '@element-plus/utils'
 import { useNamespace } from '@element-plus/hooks'
 import {
@@ -127,7 +135,10 @@ function useRender<T>(
       column.renderCell = (data) => {
         let children = null
         if (slots.default) {
-          children = slots.default(data)
+          const vnodes = slots.default(data)
+          children = vnodes.some((v) => v.type !== Comment)
+            ? vnodes
+            : originRenderCell(data)
         } else {
           children = originRenderCell(data)
         }
