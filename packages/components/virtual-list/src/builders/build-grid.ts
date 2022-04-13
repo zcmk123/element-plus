@@ -17,6 +17,7 @@ import {
   isNumber,
   isString,
 } from '@element-plus/utils'
+import { useNamespace } from '@element-plus/hooks'
 import Scrollbar from '../components/scrollbar'
 import { useGridWheel } from '../hooks/use-grid-wheel'
 import { useCache } from '../hooks/use-cache'
@@ -33,7 +34,6 @@ import {
   RTL_OFFSET_POS_DESC,
   SCROLL_EVT,
 } from '../defaults'
-
 import type {
   CSSProperties,
   Ref,
@@ -42,7 +42,12 @@ import type {
   VNode,
   VNodeChild,
 } from 'vue'
-import type { Alignment, GridConstructorProps, ScrollbarExpose } from '../types'
+import type {
+  Alignment,
+  GridConstructorProps,
+  GridScrollOptions,
+  ScrollbarExpose,
+} from '../types'
 import type { VirtualizedGridProps } from '../props'
 
 const createGrid = ({
@@ -60,6 +65,7 @@ const createGrid = ({
   getRowStopIndexForStartIndex,
 
   initCache,
+  injectToInstance,
   validateProps,
 }: GridConstructorProps<VirtualizedGridProps>) => {
   return defineComponent({
@@ -67,9 +73,12 @@ const createGrid = ({
     props: virtualizedGridProps,
     emits: [ITEM_RENDER_EVT, SCROLL_EVT],
     setup(props, { emit, expose, slots }) {
+      const ns = useNamespace('vl')
+
       validateProps(props)
       const instance = getCurrentInstance()!
       const cache = ref(initCache(props, instance))
+      injectToInstance?.(instance, cache)
       // refs
       // here windowRef and innerRef can be type of HTMLElement
       // or user defined component type, depends on the type passed
@@ -344,7 +353,7 @@ const createGrid = ({
       const scrollTo = ({
         scrollLeft = states.value.scrollLeft,
         scrollTop = states.value.scrollTop,
-      }) => {
+      }: GridScrollOptions) => {
         scrollLeft = Math.max(scrollLeft, 0)
         scrollTop = Math.max(scrollTop, 0)
         const _states = unref(states)
@@ -602,7 +611,7 @@ const createGrid = ({
           'div',
           {
             key: 0,
-            class: 'el-vg__wrapper',
+            class: ns.e('wrapper'),
           },
           [
             h(
@@ -626,6 +635,7 @@ const createGrid = ({
     },
   })
 }
+
 export default createGrid
 
 type Dir = typeof FORWARD | typeof BACKWARD
@@ -635,7 +645,7 @@ export type GridInstance = InstanceType<ReturnType<typeof createGrid>> &
     windowRef: Ref<HTMLElement>
     innerRef: Ref<HTMLElement>
     getItemStyleCache: ReturnType<typeof useCache>
-    scrollTo: (scrollOptions: { scrollLeft: number; scrollTop: number }) => void
+    scrollTo: (scrollOptions: GridScrollOptions) => void
     scrollToItem: (
       rowIndex: number,
       columnIndex: number,
