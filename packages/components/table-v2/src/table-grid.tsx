@@ -3,16 +3,17 @@ import {
   DynamicSizeGrid,
   FixedSizeGrid,
 } from '@element-plus/components/virtual-list'
-import { isObject } from '@element-plus/utils'
+import { isNumber, isObject } from '@element-plus/utils'
 import Header from './table-header'
 import { TableV2InjectionKey } from './tokens'
 import { tableV2GridProps } from './grid'
-import { sumHeights } from './utils'
+import { sum } from './utils'
 
 import type { UnwrapRef } from 'vue'
 import type {
   DynamicSizeGridInstance,
   GridDefaultSlotParams,
+  GridItemKeyGetter,
   GridItemRenderedEvtParams,
   GridScrollOptions,
   ResetAfterIndex,
@@ -33,16 +34,16 @@ const useTableGrid = (props: TableV2GridProps) => {
       return
     }
 
-    return data.length * rowHeight
+    return data.length * (rowHeight as number)
   })
 
   const fixedRowHeight = computed(() => {
     const { fixedData, rowHeight } = props
 
-    return (fixedData?.length || 0) * rowHeight
+    return (fixedData?.length || 0) * (rowHeight as number)
   })
 
-  const headerHeight = computed(() => sumHeights(props.headerHeight))
+  const headerHeight = computed(() => sum(props.headerHeight))
 
   const gridHeight = computed(() => {
     const { height } = props
@@ -53,13 +54,16 @@ const useTableGrid = (props: TableV2GridProps) => {
     return unref(headerHeight) + unref(fixedRowHeight) > 0
   })
 
+  const itemKey: GridItemKeyGetter = ({ data, rowIndex }) =>
+    data[rowIndex][props.rowKey]
+
   function onItemRendered({
     rowCacheStart,
     rowCacheEnd,
     rowVisibleStart,
     rowVisibleEnd,
   }: GridItemRenderedEvtParams) {
-    props.onRowRendered?.({
+    props.onRowsRendered?.({
       rowCacheStart,
       rowCacheEnd,
       rowVisibleStart,
@@ -68,7 +72,7 @@ const useTableGrid = (props: TableV2GridProps) => {
   }
 
   function resetAfterRowIndex(index: number, forceUpdate: boolean) {
-    bodyRef.value?.resetAfterRowIndex?.(index, forceUpdate)
+    bodyRef.value?.resetAfterRowIndex(index, forceUpdate)
   }
 
   function scrollTo(x: number, y: number): void
@@ -97,8 +101,14 @@ const useTableGrid = (props: TableV2GridProps) => {
     })
   }
 
+  function forceUpdate() {
+    unref(bodyRef)?.$forceUpdate()
+    unref(headerRef)?.$forceUpdate()
+  }
+
   return {
     bodyRef,
+    forceUpdate,
     fixedRowHeight,
     gridHeight,
     hasHeader,
@@ -106,6 +116,7 @@ const useTableGrid = (props: TableV2GridProps) => {
     headerRef,
     totalHeight,
 
+    itemKey,
     onItemRendered,
     resetAfterRowIndex,
     scrollTo,
@@ -128,6 +139,8 @@ const TableGrid = defineComponent({
       headerHeight,
       totalHeight,
 
+      forceUpdate,
+      itemKey,
       onItemRendered,
       resetAfterRowIndex,
       scrollTo,
@@ -135,6 +148,7 @@ const TableGrid = defineComponent({
     } = useTableGrid(props)
 
     expose({
+      forceUpdate,
       /**
        * @description fetch total height
        */
@@ -153,6 +167,8 @@ const TableGrid = defineComponent({
       resetAfterRowIndex,
     })
 
+    const getColumnWidth = () => props.bodyWidth
+
     return () => {
       const {
         cache,
@@ -160,42 +176,52 @@ const TableGrid = defineComponent({
         data,
         fixedData,
         useIsScrolling,
-
-        onScroll,
-
+        scrollbarAlwaysOn,
+        scrollbarEndGap,
+        scrollbarStartGap,
+        style,
         rowHeight,
         bodyWidth,
         estimatedRowHeight,
         headerWidth,
         height,
         width,
+
+        getRowHeight,
+        onScroll,
       } = props
 
-      const Grid = estimatedRowHeight ? DynamicSizeGrid : FixedSizeGrid
+      const isDynamicRowEnabled = isNumber(estimatedRowHeight)
+      const Grid = isDynamicRowEnabled ? DynamicSizeGrid : FixedSizeGrid
       const _headerHeight = unref(headerHeight)
 
       return (
-        <div role="table" class={[ns.e('table'), props.class]}>
+        <div role="table" class={[ns.e('table'), props.class]} style={style}>
           <Grid
             ref={bodyRef}
             // special attrs
             data={data}
             useIsScrolling={useIsScrolling}
+            itemKey={itemKey}
             // column attrs
             columnCache={0}
-            columnWidth={bodyWidth}
+            columnWidth={isDynamicRowEnabled ? getColumnWidth : bodyWidth}
             totalColumn={1}
             // row attrs
             totalRow={data.length}
             rowCache={cache}
-            rowHeight={rowHeight}
+            rowHeight={isDynamicRowEnabled ? getRowHeight : rowHeight}
             // DOM attrs
             width={width}
             height={unref(gridHeight)}
             class={ns.e('body')}
+            scrollbarStartGap={scrollbarStartGap}
+            scrollbarEndGap={scrollbarEndGap}
+            scrollbarAlwaysOn={scrollbarAlwaysOn}
             // handlers
             onScroll={onScroll}
             onItemRendered={onItemRendered}
+            perfMode={false}
           >
             {{
               default: (params: GridDefaultSlotParams) => {
@@ -211,7 +237,7 @@ const TableGrid = defineComponent({
           {unref(hasHeader) && (
             <Header
               ref={headerRef}
-              class={ns.e('header')}
+              class={ns.e('header-wrapper')}
               columns={columns}
               headerData={data}
               headerHeight={_headerHeight}
@@ -220,7 +246,12 @@ const TableGrid = defineComponent({
               rowHeight={rowHeight}
               width={width}
               height={Math.min(_headerHeight + unref(fixedRowHeight), height)}
-            ></Header>
+            >
+              {{
+                dynamic: slots.header,
+                fixed: slots.row,
+              }}
+            </Header>
           )}
         </div>
       )
@@ -230,8 +261,14 @@ const TableGrid = defineComponent({
 
 export default TableGrid
 
+export type TableGridRowSlotParams = {
+  columns: TableV2GridProps['columns']
+  rowData: any
+} & GridDefaultSlotParams
+
 export type TableGridInstance = InstanceType<typeof TableGrid> &
   UnwrapRef<{
+    forceUpdate: () => void
     /**
      * @description fetch total height
      */

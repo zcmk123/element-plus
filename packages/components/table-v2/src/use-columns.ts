@@ -1,4 +1,4 @@
-import { computed, ref, unref, watch } from 'vue'
+import { computed, unref } from 'vue'
 import { placeholderSign } from './private'
 
 import type { CSSProperties, Ref } from 'vue'
@@ -10,8 +10,19 @@ const calcColumnStyle = (
   column: Column<any>,
   fixedColumn: boolean
 ): CSSProperties => {
+  const flex = {
+    flexGrow: 0,
+    flexShrink: 0,
+  }
+
+  if (column.fixed) {
+    flex.flexShrink = 1
+  }
+
   const style = {
     ...(column.style ?? {}),
+    ...flex,
+    flexBasis: 'auto',
     width: column.width,
   }
 
@@ -23,33 +34,9 @@ const calcColumnStyle = (
   return style
 }
 
-const mapColumns = (columns: AnyColumn, currentColumns: AnyColumn) => {
-  return columns.map((column) => {
-    if (!column.resizable) return column
-
-    let { width } = column
-    if (column.resizable) {
-      const idx = columns.findIndex(
-        (predicated) => column.key === predicated.key
-      )
-      if (idx >= 0 && columns[idx].width === column.width) {
-        width = currentColumns[idx].width
-      }
-    }
-    return {
-      ...column,
-      width,
-    }
-  })
-}
-
 function useColumns(columns: Ref<AnyColumn>, fixed: Ref<boolean>) {
-  let __columns: AnyColumn = []
-
-  const _columns = ref<AnyColumn>([])
-
   const visibleColumns = computed(() => {
-    return unref(_columns).filter((column) => !column.hidden)
+    return unref(columns).filter((column) => !column.hidden)
   })
 
   const fixedColumnsOnLeft = computed(() =>
@@ -72,7 +59,7 @@ function useColumns(columns: Ref<AnyColumn>, fixed: Ref<boolean>) {
     unref(fixedColumnsOnLeft).forEach((column) => {
       ret.push({
         ...column,
-        isPlaceholder: placeholderSign,
+        placeholderSign,
       })
     })
 
@@ -83,17 +70,21 @@ function useColumns(columns: Ref<AnyColumn>, fixed: Ref<boolean>) {
     unref(fixedColumnOnRight).forEach((column) => {
       ret.push({
         ...column,
-        isPlaceholder: placeholderSign,
+        placeholderSign,
       })
     })
 
     return ret
   })
 
-  const columnsStyle = computed(() => {
-    const columns = unref(_columns)
+  const hasFixedColumns = computed(() => {
+    return unref(fixedColumnsOnLeft).length || unref(fixedColumnOnRight).length
+  })
 
-    return columns.reduce<Record<Column<any>['key'], CSSProperties>>(
+  const columnsStyles = computed(() => {
+    const _columns = unref(columns)
+
+    return _columns.reduce<Record<Column<any>['key'], CSSProperties>>(
       (style, column) => {
         style[column.key] = calcColumnStyle(column, unref(fixed))
         return style
@@ -102,23 +93,19 @@ function useColumns(columns: Ref<AnyColumn>, fixed: Ref<boolean>) {
     )
   })
 
-  watch(
-    columns,
-    (val) => {
-      _columns.value = mapColumns(val, __columns)
-      __columns = unref(_columns)
-    },
-    {
-      deep: true,
-    }
-  )
+  const columnsTotalWidth = computed(() => {
+    return unref(visibleColumns).reduce(
+      (width, column) => width + column.width,
+      0
+    )
+  })
 
   const getColumn = (key: KeyType) => {
-    return unref(_columns).find((column) => column.key === key)
+    return unref(columns).find((column) => column.key === key)
   }
 
   const getColumnStyle = (key: KeyType) => {
-    return unref(columnsStyle)[key]
+    return unref(columnsStyles)[key]
   }
 
   const updateColumnWidth = (column: Column<any>, width: number) => {
@@ -126,10 +113,12 @@ function useColumns(columns: Ref<AnyColumn>, fixed: Ref<boolean>) {
   }
 
   return {
-    columns: _columns,
-    columnsStyle,
+    columns,
+    columnsStyles,
+    columnsTotalWidth,
     fixedColumnsOnLeft,
     fixedColumnOnRight,
+    hasFixedColumns,
     mainColumns,
     normalColumns,
     visibleColumns,

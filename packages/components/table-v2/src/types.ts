@@ -1,7 +1,8 @@
 import type { CSSProperties, RendererElement, RendererNode, VNode } from 'vue'
+import type { FixedDir, SortOrder } from './constants'
 
 export type Alignment = 'left' | 'center' | 'right'
-export type FixedDirection = 'left' | 'right'
+export type FixedDirection = FixedDir
 export type KeyType = string | number | symbol
 
 /**
@@ -18,7 +19,7 @@ export type ColumnCommonParams<T> = {
   columnIndex: number
 }
 
-export type HeaderRendererParams<T> = {
+export type HeaderCellRendererParams<T> = {
   headerIndex: number
 } & ColumnCommonParams<T>
 
@@ -40,29 +41,30 @@ export type DataGetterParams<T> = {
 
 export type DataGetter<T> = (params: DataGetterParams<T>) => T
 export type ClassNameGetter<T> = (params: ClassNameGetterParams<T>) => string
+export type HeaderClassGetter<T> = (
+  params: ColumnCommonParams<T> & { headerIndex: number }
+) => string
 
 /**
  * Renderer/Getter types
  */
 export type CellRenderer<T> = (params: CellRendererParams<T>) => VNode
 
-export type HeaderRenderer<T> = (params: HeaderRendererParams<T>) => VNode
+export type HeaderCellRenderer<T> = (
+  params: HeaderCellRendererParams<T>
+) => VNode
 
 export type Column<T = any> = {
   key: KeyType
   /**
-   * Data part
-   */
-  dataKey?: string
-  dataGetter?: DataGetter<T>
-  /**
    * Attributes
    */
   align?: Alignment
-  className?: any | ClassNameGetter<T>
+  class?: string | ClassNameGetter<T>
   fixed?: true | FixedDirection
   title?: string
   hidden?: boolean
+  headerClass?: HeaderClassGetter<T> | string
   maxWidth?: number
   minWidth?: number
   resizable?: boolean
@@ -73,7 +75,7 @@ export type Column<T = any> = {
    * Renderers
    */
   cellRenderer?: CellRenderer<T>
-  headerRenderer?: HeaderRenderer<T>
+  headerCellRenderer?: HeaderCellRenderer<T>
   /**
    * Extendable sections
    */
@@ -81,6 +83,11 @@ export type Column<T = any> = {
 }
 
 export type Columns<T> = Column<T>[]
+
+export type SortBy = {
+  key: KeyType
+  order: SortOrder
+}
 
 export type CustomizedCellsType = VNode<
   RendererNode,
