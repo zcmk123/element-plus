@@ -4,7 +4,7 @@ import {
   FixedSizeGrid,
 } from '@element-plus/components/virtual-list'
 import { isNumber, isObject } from '@element-plus/utils'
-import Header from './table-header'
+import { Header } from './components'
 import { TableV2InjectionKey } from './tokens'
 import { tableV2GridProps } from './grid'
 import { sum } from './utils'
@@ -17,8 +17,9 @@ import type {
   GridItemRenderedEvtParams,
   GridScrollOptions,
   ResetAfterIndex,
+  Alignment as ScrollStrategy,
 } from '@element-plus/components/virtual-list'
-import type { TableV2HeaderInstance } from './table-header'
+import type { TableV2HeaderInstance } from './components'
 import type { TableV2GridProps } from './grid'
 
 const COMPONENT_NAME = 'ElTableV2Grid'
@@ -101,6 +102,10 @@ const useTableGrid = (props: TableV2GridProps) => {
     })
   }
 
+  function scrollToRow(row: number, strategy: ScrollStrategy) {
+    unref(bodyRef)?.scrollToItem(row, 1, strategy)
+  }
+
   function forceUpdate() {
     unref(bodyRef)?.$forceUpdate()
     unref(headerRef)?.$forceUpdate()
@@ -121,6 +126,7 @@ const useTableGrid = (props: TableV2GridProps) => {
     resetAfterRowIndex,
     scrollTo,
     scrollToTop,
+    scrollToRow,
   }
 }
 
@@ -145,6 +151,7 @@ const TableGrid = defineComponent({
       resetAfterRowIndex,
       scrollTo,
       scrollToTop,
+      scrollToRow,
     } = useTableGrid(props)
 
     expose({
@@ -161,6 +168,12 @@ const TableGrid = defineComponent({
        * @description scroll vertically to position y
        */
       scrollToTop,
+      /**
+       * @description scroll to a given row
+       * @params row {Number} which row to scroll to
+       * @params strategy {ScrollStrategy} use what strategy to scroll to
+       */
+      scrollToRow,
       /**
        * @description reset rendered state after row index
        */
@@ -240,7 +253,7 @@ const TableGrid = defineComponent({
               class={ns.e('header-wrapper')}
               columns={columns}
               headerData={data}
-              headerHeight={_headerHeight}
+              headerHeight={props.headerHeight}
               fixedHeaderData={fixedData}
               rowWidth={headerWidth}
               rowHeight={rowHeight}
@@ -285,6 +298,12 @@ export type TableGridInstance = InstanceType<typeof TableGrid> &
      * @description scroll vertically to position y
      */
     scrollToTop(scrollTop: number): void
+    /**
+     * @description scroll to a given row
+     * @params row {Number} which row to scroll to
+     * @params @optional strategy {ScrollStrategy} use what strategy to scroll to
+     */
+    scrollToRow(row: number, strategy: ScrollStrategy): void
     /**
      * @description reset rendered state after row index
      * @param { number } rowIndex

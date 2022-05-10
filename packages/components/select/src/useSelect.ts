@@ -15,9 +15,13 @@ import {
   CHANGE_EVENT,
   EVENT_CODE,
   UPDATE_MODEL_EVENT,
-  getComponentSize,
 } from '@element-plus/constants'
-import { debugWarn, isKorean, scrollIntoView } from '@element-plus/utils'
+import {
+  debugWarn,
+  getComponentSize,
+  isKorean,
+  scrollIntoView,
+} from '@element-plus/utils'
 import { useLocale, useNamespace, useSize } from '@element-plus/hooks'
 import { formContextKey, formItemContextKey } from '@element-plus/tokens'
 
@@ -172,7 +176,7 @@ export const useSelect = (props, states: States, ctx) => {
 
   // watch
   watch(
-    () => selectDisabled.value,
+    [() => selectDisabled.value, () => selectSize.value, () => elForm.size],
     () => {
       nextTick(() => {
         resetInputHeight()
@@ -467,7 +471,7 @@ export const useSelect = (props, states: States, ctx) => {
     for (let i = states.cachedOptions.size - 1; i >= 0; i--) {
       const cachedOption = cachedOptionsArray.value[i]
       const isEqualValue = isObjectValue
-        ? get(cachedOption, props.valueKey) === get(value, props.valueKey)
+        ? get(cachedOption.value, props.valueKey) === get(value, props.valueKey)
         : cachedOption.value === value
       if (isEqualValue) {
         option = {

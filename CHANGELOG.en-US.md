@@ -1,5 +1,110 @@
 ## Changelog
 
+### 2.2.0
+
+_2022-05-09_
+
+#### Features
+
+- Components [slider] aria keyboard controls and attrs (#7389 by @opengraphica)
+- Components [switch] add size (#7377 by @josonho)
+- Docs use home svg layers for dark (#7408 by @YunYouJun)
+- Add custom mix function for colors (#7459 by @YunYouJun)
+- Upgrade to pnpm 7 (#7457 by @sxzz)
+- Docs add Spanish translation (#7468 by @sxzz)
+- Upgrade pnpm 7 (#7480 by @sxzz)
+- Docs enable theme toggler (#7479 by @sxzz)
+- Components [form-item] auto attach labels to inputs (#7450 by @opengraphica)
+- Components [button] update text button (#7515 by @JeremyWuuuuu)
+- Components [auto-resizer] new component (#7541 by @JeremyWuuuuu)
+
+#### Bug fixes
+
+- Components [el-select-v2] clear created options (#7305 by @josonho)
+- Components [autocomplete] fetch-suggestions support AsyncFunction (#7315 by @chenxch)
+- Components [pagination] fix typo (#7420 by @fzq1998)
+- Docs icon import (#7440 by @KevinLjb)
+- Pin pnpm version (#7455 by @sxzz)
+- Deps update dependency @rollup/plugin-commonjs to v22 (#7452 by @renovate[bot])
+- Components [image] fix attrs (#7451 by @sxzz)
+- Ssr-testing fix code (#7466 by @sxzz)
+- Input-number precision accuracy (#7398 by @chenxch)
+- Components [descriptions] style (#7474 by @kooriookami)
+- Components [select]label is not shown when value is a object (#7054 by @exherb)
+- Theme-chalk dark mode details (#7460 by @YunYouJun)
+- Table/dropdown/step dark details (#7483 by @YunYouJun)
+- Components [select] The problem that the size changes and the height does not change (#7471 by @chenxch)
+- Components [input] when textarea resize is both, the wordLimit position inaccurate (#7445 by @buqiyuan)
+- Components [pickers] text button issue (#7530 by @JeremyWuuuuu)
+- Components [popconfirm] text button type (#7526 by @JeremyWuuuuu)
+- Components [popper] appendToBody API deprecation (#7534 by @JeremyWuuuuu)
+- Ci publish nightly (#7537 by @sxzz)
+- Components [virtual-table] horizontal scroll (#7538 by @JeremyWuuuuu)
+- Theme-chalk [button] auto insert space (#7539 by @sxzz)
+- Theme-chalk datetime picker time panel bg (#7543 by @YunYouJun)
+- Docs icon collection link (#7547 by @btea)
+- Docs fix Cross hovering (#7558 by @kooriookami)
+- Components input internal autofill border color (#7561 by @YunYouJun)
+- Components [el-tree-v2]prop `icon` support Component. fix [#7517] (#7518 by @JobinJia)
+- Tree-select nodeKey default selected (#7172 by @chenxch) (#7181)
+- Component cascader searching placeholder does not disappear (#7540 by @anflower)
+- Components select v2 remote method trigger reset value when blur (#7569 by @YunYouJun)
+
+#### Refactors
+
+- Components [autocomplete] improve typings (#7381 by @sxzz)
+- Theme-chalk scss css var namespace (#7344 by @YunYouJun)
+- Use svg for guide & resources (#7399 by @YunYouJun)
+- Theme-chalk [tabs] use font-size-base (#7416 by @satrong)
+- Remove babel (#7453 by @sxzz)
+- Components [tabs] refactor register pane (#7449 by @sxzz)
+- Docs add missing deps (#7465 by @sxzz)
+- Components!: remove deprecated warning (#7528 by @JeremyWuuuuu)
+- Components [popconfirm] refactor to script-setup (#7522 by @sxzz)
+
+### 2.1.11
+
+_2022-04-25_
+
+#### Features
+
+- Drop jest (#7248 by @sxzz)
+- Components [virtual-table] renderers (#7273 by @JeremyWuuuuu)
+- Components [virtual-list] renderers
+- Components [virtual-table] empty renderer (#7308 by @JeremyWuuuuu)
+- Components [virtual-table] overlay renderer (#7314 by @JeremyWuuuuu)
+- Components [virtual-table] compsables (#7341 by @JeremyWuuuuu)
+- Components [input] add input formatter (#6876 by @Serendipity96)
+- Components[image] imageviewer add close-on-press-escape(#7154 by @chenxch) (#7182)
+
+#### Bug fixes
+
+- Components [el-upload] icon is covered (#6951 by @josonho)
+- Deps update all non-major dependencies (#7209 by @renovate[bot])
+- Theme-chalk components details when dark (#7229 by @YunYouJun)
+- Components [input] fix status icon gap (#7228 by @plainheart)
+- Components [select] not set input padding anymore (#7269 by @plainheart)
+- Docs radio-group (#7257 by @OneDayOneStep)
+- Tsconfig (#7319 by @sxzz)
+- Build dts generate (#7322 by @sxzz)
+- Popperjs esm version (#7321 by @sxzz)
+- Components [upload] stop bubble (#7304 by @josonho)
+- [upload] prevent preview link (#7326 by @sxzz)
+- Components [upload] make action optional (#7325 by @sxzz)
+- Theme-chalk [pagination] fix spacing when sizes is at the end (#7339 by @plainheart)
+- Components [calendar] fix range year bug (#7227 by @Dreamcreative)
+- Components [input-number] suffix icon position (#7358 by @josonho)
+- Components [date-picker] fix input inner box sizing (#7373 by @plainheart)
+- Reasonable remaining (#7353 by @chenxch) (#7364)
+- Components [input] fix prepend/append not fill height (#7274 by @plainheart)
+- Color-picker v-model trigger active-change (#7260 by @chenxch)
+- Directives use standard wheel event with passive option (#7256 by @TANGENNT)
+- Components [col] component typing issue (#7376 by @JeremyWuuuuu)
+
+#### Refactors
+
+- Utils move function (#7336 by @sxzz)
+
 ### 2.1.10
 
 _2022-04-18_

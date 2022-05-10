@@ -11,25 +11,30 @@ import Row from './renderers/row'
 import Cell from './renderers/cell'
 import Header from './renderers/header'
 import HeaderCell from './renderers/header-cell'
+import Footer from './renderers/footer'
+import Empty from './renderers/empty'
+import Overlay from './renderers/overlay'
 
 import type { TableGridRowSlotParams } from './table-grid'
-import type { TableV2RowCellRenderParam } from './table-row'
-import type { TableV2HeaderRendererParams } from './table-header'
-
-import type { TableV2HeaderRowCellRendererParams } from './table-header-row'
+import type { ScrollStrategy } from './composables/use-scrollbar'
+import type {
+  TableV2HeaderRendererParams,
+  TableV2HeaderRowCellRendererParams,
+  TableV2RowCellRenderParam,
+} from './components'
 
 const COMPONENT_NAME = 'ElTableV2'
 
 const TableV2 = defineComponent({
   name: COMPONENT_NAME,
   props: tableV2Props,
-  setup(props, { slots }) {
+  setup(props, { slots, expose }) {
     const ns = useNamespace('table-v2')
 
     const {
       columnsStyles,
       fixedColumnsOnLeft,
-      fixedColumnOnRight,
+      fixedColumnsOnRight,
       mainColumns,
       mainTableHeight,
       fixedTableHeight,
@@ -48,8 +53,18 @@ const TableV2 = defineComponent({
       isScrolling,
 
       bodyWidth,
+      emptyStyle,
       rootStyle,
       headerWidth,
+      footerHeight,
+
+      showEmpty,
+
+      // exposes
+      scrollTo,
+      scrollToLeft,
+      scrollToTop,
+      scrollToRow,
 
       getRowHeight,
       onColumnSorted,
@@ -61,7 +76,29 @@ const TableV2 = defineComponent({
       onVerticalScroll,
     } = useTable(props)
 
-    // function renderFooter() {}
+    expose({
+      /**
+       * @description scroll to a given position
+       * @params params {{ scrollLeft?: number, scrollTop?: number }} where to scroll to.
+       */
+      scrollTo,
+      /**
+       * @description scroll to a given position horizontally
+       * @params scrollLeft {Number} where to scroll to.
+       */
+      scrollToLeft,
+      /**
+       * @description scroll to a given position vertically
+       * @params scrollTop { Number } where to scroll to.
+       */
+      scrollToTop,
+      /**
+       * @description scroll to a given row
+       * @params row {Number} which row to scroll to
+       * @params @optional strategy {ScrollStrategy} use what strategy to scroll to
+       */
+      scrollToRow,
+    })
 
     provide(TableV2InjectionKey, {
       ns,
@@ -73,6 +110,7 @@ const TableV2 = defineComponent({
     return () => {
       const {
         cache,
+        cellProps,
         estimatedRowHeight,
         expandColumnKey,
         fixedData,
@@ -112,7 +150,7 @@ const TableV2 = defineComponent({
         rowKey,
         rowHeight,
         scrollbarAlwaysOn,
-        scrollbarStartGap: 0,
+        scrollbarStartGap: 2,
         scrollbarEndGap: vScrollbarSize,
         useIsScrolling,
         width,
@@ -138,7 +176,7 @@ const TableV2 = defineComponent({
         height: _fixedTableHeight,
         rowKey,
         scrollbarAlwaysOn,
-        scrollbarStartGap: 0,
+        scrollbarStartGap: 2,
         scrollbarEndGap: vScrollbarSize,
         useIsScrolling,
         width: leftColumnsWidth,
@@ -152,7 +190,7 @@ const TableV2 = defineComponent({
       const rightTableProps = {
         cache,
         class: ns.e('right'),
-        columns: unref(fixedColumnOnRight),
+        columns: unref(fixedColumnsOnRight),
         data: _data,
         estimatedRowHeight,
         rightTableRef,
@@ -163,7 +201,7 @@ const TableV2 = defineComponent({
         height: _fixedTableHeight,
         rowKey,
         scrollbarAlwaysOn,
-        scrollbarStartGap: 0,
+        scrollbarStartGap: 2,
         scrollbarEndGap: vScrollbarSize,
         width: rightColumnsWidthWithScrollbar,
         style: `--${unref(
@@ -173,10 +211,12 @@ const TableV2 = defineComponent({
         getRowHeight,
         onScroll: onVerticalScroll,
       }
+      const _columnsStyles = unref(columnsStyles)
 
       const tableRowProps = {
         ns,
         depthMap: unref(depthMap),
+        columnsStyles: _columnsStyles,
         expandColumnKey,
         expandedRowKeys: unref(expandedRowKeys),
         estimatedRowHeight,
@@ -192,11 +232,11 @@ const TableV2 = defineComponent({
       }
 
       const tableCellProps = {
+        cellProps,
         expandColumnKey,
         indentSize,
         iconSize,
         rowKey,
-        columnsStyles: unref(columnsStyles),
         expandedRowKeys: unref(expandedRowKeys),
         ns,
       }
@@ -205,6 +245,7 @@ const TableV2 = defineComponent({
         ns,
         headerClass,
         headerProps,
+        columnsStyles: _columnsStyles,
       }
 
       const tableHeaderCellProps = {
@@ -213,7 +254,6 @@ const TableV2 = defineComponent({
         sortBy,
         sortState,
         headerCellProps,
-        columnsStyles: unref(columnsStyles),
         onColumnSorted,
       }
 
@@ -224,11 +264,19 @@ const TableV2 = defineComponent({
               row: slots.row,
               cell: (props: TableV2RowCellRenderParam) =>
                 slots.cell ? (
-                  <Cell {...props} {...tableCellProps}>
+                  <Cell
+                    {...props}
+                    {...tableCellProps}
+                    style={_columnsStyles[props.column.key]}
+                  >
                     {slots.cell}
                   </Cell>
                 ) : (
-                  <Cell {...props} {...tableCellProps} />
+                  <Cell
+                    {...props}
+                    {...tableCellProps}
+                    style={_columnsStyles[props.column.key]}
+                  />
                 ),
             }}
           </Row>
@@ -239,11 +287,19 @@ const TableV2 = defineComponent({
               header: slots.header,
               cell: (props: TableV2HeaderRowCellRendererParams) =>
                 slots['header-cell'] ? (
-                  <HeaderCell {...props} {...tableHeaderCellProps}>
+                  <HeaderCell
+                    {...props}
+                    {...tableHeaderCellProps}
+                    style={_columnsStyles[props.column.key]}
+                  >
                     {slots['header-cell']}
                   </HeaderCell>
                 ) : (
-                  <HeaderCell {...props} {...tableHeaderCellProps} />
+                  <HeaderCell
+                    {...props}
+                    {...tableHeaderCellProps}
+                    style={_columnsStyles[props.column.key]}
+                  />
                 ),
             }}
           </Header>
@@ -251,6 +307,7 @@ const TableV2 = defineComponent({
       }
 
       const rootKls = [
+        props.class,
         ns.b(),
         ns.e('root'),
         {
@@ -258,11 +315,29 @@ const TableV2 = defineComponent({
         },
       ]
 
+      const footerProps = {
+        class: ns.e('footer'),
+        style: unref(footerHeight),
+      }
+
       return (
         <div class={rootKls} style={unref(rootStyle)}>
           <MainTable {...mainTableProps}>{tableSlots}</MainTable>
           <LeftTable {...leftTableProps}>{tableSlots}</LeftTable>
           <RightTable {...rightTableProps}>{tableSlots}</RightTable>
+          {slots.footer && (
+            <Footer {...footerProps}>{{ default: slots.footer }}</Footer>
+          )}
+          {unref(showEmpty) && (
+            <Empty class={ns.e('empty')} style={unref(emptyStyle)}>
+              {{ default: slots.empty }}
+            </Empty>
+          )}
+          {slots.overlay && (
+            <Overlay class={ns.e('overlay')}>
+              {{ default: slots.overlay }}
+            </Overlay>
+          )}
         </div>
       )
     }
@@ -271,4 +346,26 @@ const TableV2 = defineComponent({
 
 export default TableV2
 
-export type TableV2Instance = InstanceType<typeof TableV2>
+export type TableV2Instance = InstanceType<typeof TableV2> & {
+  /**
+   * @description scroll to a given position
+   * @params params {{ scrollLeft?: number, scrollTop?: number }} where to scroll to.
+   */
+  scrollTo: (param: { scrollLeft?: number; scrollTop?: number }) => void
+  /**
+   * @description scroll to a given position horizontally
+   * @params scrollLeft {Number} where to scroll to.
+   */
+  scrollToLeft: (scrollLeft: number) => void
+  /**
+   * @description scroll to a given position vertically
+   * @params scrollTop { Number } where to scroll to.
+   */
+  scrollToTop: (scrollTop: number) => void
+  /**
+   * @description scroll to a given row
+   * @params row {Number} which row to scroll to
+   * @params strategy {ScrollStrategy} use what strategy to scroll to
+   */
+  scrollToRow(row: number, strategy?: ScrollStrategy): void
+}

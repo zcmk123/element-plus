@@ -8,10 +8,6 @@ import {
 import type { ExtractPropTypes } from 'vue'
 
 export const imageProps = buildProps({
-  appendToBody: {
-    type: Boolean,
-    default: undefined,
-  },
   hideOnClickModal: {
     type: Boolean,
     default: false,
@@ -48,6 +44,10 @@ export const imageProps = buildProps({
     default: 0,
   },
   infinite: {
+    type: Boolean,
+    default: true,
+  },
+  closeOnPressEscape: {
     type: Boolean,
     default: true,
   },
